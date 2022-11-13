@@ -20,7 +20,8 @@ import java.util.Objects;
         @Index(columnList = "createdBy")
 })
 @Entity
-public class ArticleComment extends AuditingFields{
+
+public class ArticleComment extends AuditingFields {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

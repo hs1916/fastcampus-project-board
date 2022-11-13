@@ -15,6 +15,7 @@ import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 
+
 @Getter
 @ToString
 @EntityListeners(AuditingEntityListener.class)
@@ -29,6 +30,7 @@ public abstract class AuditingFields {
     @CreatedBy
     @Column(nullable = false, updatable = false, length = 100)
     protected String createdBy; // 생성자
+
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @LastModifiedDate
