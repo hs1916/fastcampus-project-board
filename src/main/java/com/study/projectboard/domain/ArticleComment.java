@@ -20,6 +20,7 @@ import java.util.Objects;
         @Index(columnList = "createdBy")
 })
 @Entity
+
 public class ArticleComment extends AuditingFields {
 
     @Id
@@ -33,7 +34,6 @@ public class ArticleComment extends AuditingFields {
     @Setter
     @Column(nullable = false, length = 500)
     private String content; // 본문
-
 
     private ArticleComment(Article article, String content) {
         this.article = article;
