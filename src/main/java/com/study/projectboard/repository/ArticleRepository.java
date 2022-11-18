@@ -1,7 +1,6 @@
 package com.study.projectboard.repository;
 
 import com.querydsl.core.types.dsl.DateTimeExpression;
-import com.querydsl.core.types.dsl.SimpleExpression;
 import com.querydsl.core.types.dsl.StringExpression;
 import com.study.projectboard.domain.Article;
 import com.study.projectboard.domain.QArticle;

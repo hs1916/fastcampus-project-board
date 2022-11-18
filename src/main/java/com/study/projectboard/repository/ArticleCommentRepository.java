@@ -2,7 +2,6 @@ package com.study.projectboard.repository;
 
 import com.querydsl.core.types.dsl.DateTimeExpression;
 import com.querydsl.core.types.dsl.StringExpression;
-import com.study.projectboard.domain.Article;
 import com.study.projectboard.domain.ArticleComment;
 import com.study.projectboard.domain.QArticleComment;
 import org.springframework.data.jpa.repository.JpaRepository;
