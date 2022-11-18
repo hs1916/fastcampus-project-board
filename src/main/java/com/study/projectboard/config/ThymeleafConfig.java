@@ -2,7 +2,6 @@ package com.study.projectboard.config;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.context.annotation.Bean;
@@ -23,9 +22,8 @@ public class ThymeleafConfig {
     }
 
 
-    @Getter
-    @Setter
     @RequiredArgsConstructor
+    @Getter
     @ConstructorBinding
     @ConfigurationProperties("spring.thymeleaf3")
     public static class Thymeleaf3Properties {
