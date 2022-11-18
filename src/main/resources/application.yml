@@ -12,6 +12,7 @@ logging:
 
 
 spring:
+  thymeleaf3.decoupled-logic: true
   datasource:
     url: jdbc:mysql://localhost:3307/myBoard
     username: heechan
