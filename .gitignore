@@ -223,4 +223,7 @@ gradle-app.setting
 ### Querydsl
 /src/main/generated
 
+### jpa buddy
+/.jpb
+
 # End of https://www.toptal.com/developers/gitignore/api/java,gradle,intellij+all,windows,macos,visualstudiocode

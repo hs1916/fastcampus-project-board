@@ -2,6 +2,7 @@ package com.study.projectboard.repository;
 
 import com.study.projectboard.config.JpaConfig;
 import com.study.projectboard.domain.Article;
+import com.study.projectboard.domain.UserAccount;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,27 +21,32 @@ class JpaRepositoryTest {
 
     private final ArticleRepository articleRepository;
     private final ArticleCommentRepository articleCommentRepository;
+    private final UserAccountRepository userAccountRepository;
 
 
     @Autowired
-    public JpaRepositoryTest(ArticleRepository articleRepository, ArticleCommentRepository articleCommentRepository) {
+    public JpaRepositoryTest(ArticleRepository articleRepository, ArticleCommentRepository articleCommentRepository, UserAccountRepository userAccountRepository) {
         this.articleRepository = articleRepository;
         this.articleCommentRepository = articleCommentRepository;
+        this.userAccountRepository = userAccountRepository;
     }
 
     @DisplayName("select 테스트")
     @Test
     void givenWhenThen() {
         //given
+        long previousCount = articleRepository.count();
+        UserAccount userAccount = userAccountRepository.save(
+                UserAccount.of("heechan", "password", null, null, null)
+        );
+        Article article = Article.of(userAccount, "new Article", "new content", "#spring");
 
 
         //when
-        List<Article> articles = articleRepository.findAll();
+        articleRepository.save(article);
 
-        //then
-        assertThat(articles)
-                .isNotNull()
-                .hasSize(123);
+        // then
+        assertThat(articleRepository.count()).isEqualTo(previousCount + 1);
     }
 
     @DisplayName("insert 테스트")
@@ -48,7 +54,10 @@ class JpaRepositoryTest {
     void givenWhenThenInsert() {
         //given
         long previousCount = articleRepository.count();
-        Article article = Article.of("new article", "new content", "#spring");
+        UserAccount userAccount = userAccountRepository.save(
+                UserAccount.of("heechan", "password", null, null, null)
+        );
+        Article article = Article.of(userAccount, "new article", "new content", "#spring");
 
 
         //when
