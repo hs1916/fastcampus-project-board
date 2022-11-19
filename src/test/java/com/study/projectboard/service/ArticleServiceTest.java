@@ -4,7 +4,6 @@ import com.study.projectboard.domain.Article;
 import com.study.projectboard.domain.UserAccount;
 import com.study.projectboard.domain.type.SearchType;
 import com.study.projectboard.dto.ArticleDto;
-import com.study.projectboard.dto.ArticleUpdateDto;
 import com.study.projectboard.dto.ArticleWithCommentsDto;
 import com.study.projectboard.dto.UserAccountDto;
 import com.study.projectboard.repository.ArticleRepository;
@@ -56,14 +55,14 @@ class ArticleServiceTest {
         SearchType searchType = SearchType.TITLE;
         String searchKeyword = "title";
         Pageable pageable = Pageable.ofSize(20);
-        given(articleRepository.findByTitle(searchKeyword, pageable)).willReturn(Page.empty());
+        given(articleRepository.findByTitleContaining(searchKeyword, pageable)).willReturn(Page.empty());
 
         // when
         Page<ArticleDto> articles = sut.searchArticles(searchType, searchKeyword, pageable);
 
         // then
         assertThat(articles).isEmpty();
-        then(articleRepository).should().findByTitle(searchKeyword, pageable);
+        then(articleRepository).should().findByTitleContaining(searchKeyword, pageable);
     }
 
     @DisplayName("게시글을 조회하면, 게시글을 반환한다.")
@@ -86,7 +85,7 @@ class ArticleServiceTest {
         then(articleRepository).should().findById(articleId);
     }
 
-    @DisplayName("게시글 정보를 입력하면, 게시글을 생성한다.")
+    @DisplayName("없는 게시글 ID를 입력하면, 게시글 없이 리턴된다")
     @Test
     void notExistArticleTest() {
         Long articleId = 0L;
@@ -99,6 +98,17 @@ class ArticleServiceTest {
                 .hasMessage("게시글이 없습니다 - articleId: " + articleId);
 
         then(articleRepository).should().findById(articleId);
+    }
+
+    @DisplayName("게시글 정보를 입력하면, 게시글을 생성한다.")
+    @Test
+    void saveArticleTest() {
+        ArticleDto dto = createArticleDto();
+        given(articleRepository.save(any(Article.class))).willReturn(createArticle());
+
+        sut.saveArticle(dto);
+
+        then(articleRepository).should().save(any(Article.class));
     }
 
     @DisplayName("게시글의 수정 정보를 입력하면, 게시글을 수정한다.")
