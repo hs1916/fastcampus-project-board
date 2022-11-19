@@ -1,15 +1,28 @@
 package com.study.projectboard.controller;
 
 import com.study.projectboard.config.SecurityConfig;
+import com.study.projectboard.dto.ArticleWithCommentsDto;
+import com.study.projectboard.dto.UserAccountDto;
+import com.study.projectboard.service.ArticleService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
+import java.util.Set;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -20,6 +33,9 @@ class ArticleControllerTest {
 
     private final MockMvc mockMvc;
 
+    @MockBean
+    private ArticleService articleService;
+
     @Autowired
     ArticleControllerTest(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
@@ -29,23 +45,37 @@ class ArticleControllerTest {
     @DisplayName("[view][GET] 게시글 리스트 (게시판) 페이지 - 정상 호출")
     @Test
     void givenWhenThen() throws Exception {
+
+        given(articleService.searchArticles(eq(null), eq(null), any(Pageable.class)))
+                .willReturn(Page.empty());
+
+
         mockMvc.perform(get("/articles"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/index"))
                 .andExpect(model().attributeExists("articles"));
+
+        then(articleService).should().searchArticles(eq(null), eq(null), any(Pageable.class));
     }
 
 //    @Disabled("구현 중")
     @DisplayName("[view][GET] 게시글 상세 페이지 - 정상 호출")
     @Test
     void getSinglePage() throws Exception {
-        mockMvc.perform(get("/articles/1"))
+
+        Long articleId = 1L;
+        given(articleService.getArticle(articleId)).willReturn(createArticleWithCommentsDto());
+
+
+        mockMvc.perform(get("/articles/" + articleId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/detail"))
                 .andExpect(model().attributeExists("article"))
                 .andExpect(model().attributeExists("articleComments"));
+
+        then(articleService).should().getArticle(articleId);
     }
 
     @Disabled("구현 중")
@@ -81,4 +111,35 @@ class ArticleControllerTest {
         mockMvc.perform(delete("/api/userAccounts")).andExpect(status().isNotFound());
         mockMvc.perform(head("/api/userAccounts")).andExpect(status().isNotFound());
     }
+
+    private ArticleWithCommentsDto createArticleWithCommentsDto() {
+        return ArticleWithCommentsDto.of(
+                1L,
+                createUserAccountDto(),
+                Set.of(),
+                "title",
+                "content",
+                "#java",
+                LocalDateTime.now(),
+                "heechan",
+                LocalDateTime.now(),
+                "heechan"
+        );
+    }
+
+    private UserAccountDto createUserAccountDto() {
+        return UserAccountDto.of(
+                1L,
+                "heechan",
+                "pw",
+                "hs1916@gmail.com",
+                "hee",
+                "memo",
+                LocalDateTime.now(),
+                "hechan",
+                LocalDateTime.now(),
+                "heechan"
+        );
+    }
+
 }
