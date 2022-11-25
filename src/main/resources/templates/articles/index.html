@@ -9,7 +9,10 @@
 
 </head>
 <body>
-    <header id="header"></header>
+    <header id="header">
+        헤더 삽입부
+        <hr>
+    </header>
     <main class="container">
         <div class="row">
             <div class="card card-margin search-form">
@@ -47,21 +50,21 @@
                 </div>
             </div>
         </div>
-        <table class="table">
+        <table class="table" id="article-table">
             <thead>
                 <tr>
-                    <th class="col-6">제목</th>
-                    <th class="col-2">해시태그</th>
-                    <th class="col">작성자</th>
-                    <th class="col">작성일</th>
+                    <th class="title col-6">제목</th>
+                    <th class="hashtag col-2">해시태그</th>
+                    <th class="user-id col">작성자</th>
+                    <th class="created-at col">작성일</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>첫번째글</td>
-                    <td>#java</td>
-                    <td>heechan</td>
-                    <td><time>2022-01-01</time></td>
+                    <td class="title"><a>첫번째글</a></td>
+                    <td class="hashtag">#java</td>
+                    <td class="user-id">heechan</td>
+                    <td class="created-at"><time>2022-01-01</time></td>
                 </tr>
                 <tr>
                     <td>두번째글</td>
@@ -75,7 +78,6 @@
                     <td>heechan</td>
                     <td><time>2022-01-03</time></td>
                 </tr>
-
             </tbody>
             <tfoot>
 
