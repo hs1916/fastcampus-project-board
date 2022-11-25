@@ -38,8 +38,6 @@ spring:
       base-path: /api
       detection-strategy: annotated
 
-
-
 #---
 #spring:
 #  config.activate.on-profile: testdb
