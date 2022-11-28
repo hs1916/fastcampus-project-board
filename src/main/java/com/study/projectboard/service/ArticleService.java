@@ -31,6 +31,13 @@ public class ArticleService {
 
     }
 
+    /**
+     * 검색에 따른 결과를 리턴한다
+     * @param searchType
+     * @param searchKeyword
+     * @param pageable
+     * @return
+     */
     @Transactional(readOnly = true)
     public Page<ArticleDto> searchArticles(SearchType searchType, String searchKeyword, Pageable pageable) {
 
