@@ -21,6 +21,8 @@ public interface ArticleRepository extends JpaRepository<Article, Long>,
         QuerydslBinderCustomizer<QArticle>
 {
 
+
+
     Page<Article> findByTitleContaining(String title, Pageable pageable);
 
     Page<Article> findByContentContaining(String content, Pageable pageable);
