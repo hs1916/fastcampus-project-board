@@ -3,7 +3,6 @@ package com.study.projectboard.dto;
 import com.study.projectboard.domain.UserAccount;
 
 import java.time.LocalDateTime;
-
 public record UserAccountDto(
         Long id,
         String userId,
@@ -16,8 +15,17 @@ public record UserAccountDto(
         LocalDateTime modifiedAt,
         String modifiedBy
 ) {
+    public static UserAccountDto of(String userId, String userPassword, String email, String nickname, String memo, LocalDateTime createdAt, String createdBy, LocalDateTime modifiedAt, String modifiedBy) {
+        return new UserAccountDto(null, userId, userPassword, email, nickname, memo, createdAt, createdBy, modifiedAt, modifiedBy);
+    }
+
     public static UserAccountDto of(Long id, String userId, String userPassword, String email, String nickname, String memo, LocalDateTime createdAt, String createdBy, LocalDateTime modifiedAt, String modifiedBy) {
         return new UserAccountDto(id, userId, userPassword, email, nickname, memo, createdAt, createdBy, modifiedAt, modifiedBy);
+    }
+
+
+    public static UserAccountDto of(String userId, String userPassword, String email, String nickname, String memo) {
+        return new UserAccountDto(null, userId, userPassword, email, nickname, memo, null, null, null, null);
     }
 
     public static UserAccountDto from(UserAccount entity) {
@@ -35,10 +43,6 @@ public record UserAccountDto(
         );
     }
 
-    public static UserAccountDto of(String userId, String userPassword, String email, String nickname, String memo) {
-        return new UserAccountDto(null, userId, userPassword, email, nickname, memo, null, null, null, null);
-    }
-
     public UserAccount toEntity() {
         return UserAccount.of(
                 userId,
@@ -48,5 +52,4 @@ public record UserAccountDto(
                 memo
         );
     }
-
 }
