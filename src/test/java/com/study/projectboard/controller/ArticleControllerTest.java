@@ -1,6 +1,7 @@
 package com.study.projectboard.controller;
 
 import com.study.projectboard.config.SecurityConfig;
+import com.study.projectboard.config.TestSecurityConfig;
 import com.study.projectboard.domain.constant.FormStatus;
 import com.study.projectboard.domain.constant.SearchType;
 import com.study.projectboard.dto.ArticleDto;
@@ -23,6 +24,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.TestExecutionEvent;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -36,7 +40,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DisplayName("View 컨트롤로 - 게시글")
-@Import(value = {SecurityConfig.class, FormDataEncoder.class})
+@Import(value = {TestSecurityConfig.class, FormDataEncoder.class})
 @WebMvcTest(controllers = {ArticleController.class})
 class ArticleControllerTest {
 
@@ -102,6 +106,42 @@ class ArticleControllerTest {
         then(paginationService).should().getPaginationBarNumbers(anyInt(), anyInt());
     }
 
+    @WithMockUser
+    @DisplayName("[view][GET] 게시글 페이지 - 정상 호출, 인증된 사용자")
+    @Test
+    void givenAuthorizedUser_whenRequestingArticleView_thenReturnsArticleView() throws Exception {
+        // given
+        Long articleId = 1L;
+        Long totalCount = 1L;
+        given(articleService.getArticleWithComments(articleId)).willReturn(createArticleWithCommentsDto());
+        given(articleService.getArticleCount()).willReturn(totalCount);
+
+        mockMvc.perform(get("/articles/" + articleId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(view().name("articles/detail"))
+                .andExpect(model().attributeExists("article"))
+                .andExpect(model().attributeExists("articleComments"))
+                .andExpect(model().attribute("totalCount", totalCount));
+
+
+        then(articleService).should().getArticleWithComments(articleId);
+        then(articleService).should().getArticleCount();
+    }
+
+    @DisplayName("[view][GET] 게시글 페이지 - 인증 없을 땐 로그인 페이지로 이동")
+    @Test
+    void noAuthenticationRedirectToLoginPage() throws Exception {
+        // given
+        Long articleId = 1L;
+
+        mockMvc.perform(get("/articles/" + articleId))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login"));
+
+        then(articleService).shouldHaveNoInteractions();
+    }
+
 
     @DisplayName("[view][GET] 게시글 리스트 (게시판) 페이지 - 페이징, 정렬기능")
     @Test
@@ -135,7 +175,7 @@ class ArticleControllerTest {
         then(paginationService).should().getPaginationBarNumbers(pageable.getPageNumber(), Page.empty().getTotalPages());
     }
 
-    //    @Disabled("구현 중")
+    @Disabled("구현 중")
     @DisplayName("[view][GET] 게시글 상세 페이지 - 정상 호출")
     @Test
     void getSinglePage() throws Exception {
@@ -229,6 +269,7 @@ class ArticleControllerTest {
         mockMvc.perform(head("/api/userAccounts")).andExpect(status().isNotFound());
     }
 
+    @WithMockUser
     @DisplayName("[view][GET] 새 게시글 작성 페이지")
     @Test
     void givenNothing_whenRequesting_thenReturnsNewArticlePage() throws Exception {
@@ -242,6 +283,7 @@ class ArticleControllerTest {
                 .andExpect(model().attribute("formStatus", FormStatus.CREATE));
     }
 
+    @WithUserDetails(value = "heechanTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[view][POST] 새 게시글 등록 - 정상 호출")
     @Test
     void givenNewArticleInfo_whenRequesting_thenSavesNewArticle() throws Exception {
@@ -262,7 +304,22 @@ class ArticleControllerTest {
         then(articleService).should().saveArticle(any(ArticleDto.class));
     }
 
-    @DisplayName("[view][GET] 게시글 수정 페이지")
+    @DisplayName("[view][GET] 게시글 수정 페이지 - 인증 없을 땐 로그인 페이지로 이동")
+    @Test
+    void givenNothing_whenRequesting_thenRedirectsToLoginPage() throws Exception {
+
+        long articleId = 1L;
+
+        mockMvc.perform(get("/articles/" + articleId + "/form"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login"));
+
+        then(articleService).shouldHaveNoInteractions();
+    }
+
+
+    @WithMockUser
+    @DisplayName("[view][GET] 게시글 수정 페이지, 인증된 사용자 ")
     @Test
     void givenNothing_whenRequesting_thenReturnsUpdatedArticlePage() throws Exception {
         // Given
@@ -280,6 +337,7 @@ class ArticleControllerTest {
         then(articleService).should().getArticle(articleId);
     }
 
+    @WithUserDetails(value = "heechanTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[view][POST] 게시글 수정 - 정상 호출")
     @Test
     void givenUpdatedArticleInfo_whenRequesting_thenUpdatesNewArticle() throws Exception {
@@ -301,12 +359,14 @@ class ArticleControllerTest {
         then(articleService).should().updateArticle(eq(articleId), any(ArticleDto.class));
     }
 
+    @WithUserDetails(value = "heechanTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[view][POST] 게시글 삭제 - 정상 호출")
     @Test
     void givenArticleIdToDelete_whenRequesting_thenDeletesArticle() throws Exception {
         // Given
         long articleId = 1L;
-        willDoNothing().given(articleService).deleteArticle(articleId);
+        String userId = "heechanTest";
+        willDoNothing().given(articleService).deleteArticle(articleId, userId);
 
         // When & Then
         mockMvc.perform(
@@ -317,7 +377,7 @@ class ArticleControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/articles"))
                 .andExpect(redirectedUrl("/articles"));
-        then(articleService).should().deleteArticle(articleId);
+        then(articleService).should().deleteArticle(articleId, userId);
     }
 
 
