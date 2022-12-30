@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface UserAccountRepository extends JpaRepository<UserAccount, Long> {
 
 //    Page<Article> findByUserAccount_UserIdContaining(String userId, Pageable pageable);
-    UserAccount findByUserId(String userId);
+    Optional<UserAccount> findByUserId(String userId);
 }
