@@ -60,7 +60,7 @@ spring:
     activate:
       on-profile: heroku
   datasource:
-    url: ${JAWSDB_URL}
+    url: ${JAWSDB_URL} # heroku 설정 추가
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
